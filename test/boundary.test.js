@@ -49,5 +49,9 @@ async function run() {
 
 run().catch((err) => {
   console.error(err);
-  process.exit(1);
+  if (typeof process !== 'undefined' && process.exit) {
+    process.exit(1);
+  }
 });
+
+export { run };
