@@ -167,10 +167,13 @@ export async function runPuppeteerSuite() {
       };
     });
 
+    const summaryMsg =
+      results.failed === 0
+        ? `🎯 Puppeteer Verification Result: All ${results.passed} suites passed (${results.duration.toFixed(1)}ms)`
+        : `🎯 Puppeteer Verification Result: ${results.passed} passed, ${results.failed} issues (${results.duration.toFixed(1)}ms)`;
+
     console.log('==================================================');
-    console.log(
-      `🎯 Puppeteer Verification Result: ${results.passed} passed, ${results.failed} failed (${results.duration.toFixed(1)}ms)`
-    );
+    console.log(summaryMsg);
     console.log('==================================================');
 
     return {

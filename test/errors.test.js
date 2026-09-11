@@ -14,7 +14,7 @@ import { decodeBase58 } from '../src/core/Bs58.js';
 import { assertThrows, assert } from './_assert.js';
 
 async function run() {
-  console.log('Testing exception handling and rejection pathways...');
+  console.log('Testing custom type hierarchy and input validation guards...');
 
   // 1. Inheritance checks
   const valErr = new ValidationError('test validation', 'param');
@@ -30,7 +30,7 @@ async function run() {
   // 4. Base58 invalid character
   assertThrows(() => decodeBase58('0OIl'), EncodingError, 'Invalid Base58 char should throw EncodingError');
 
-  console.log('✓ All exception handling and rejection tests passed.');
+  console.log('✓ All type hierarchy and input validation tests passed.');
 }
 
 if (typeof process !== 'undefined' && process.argv?.[1]?.includes('errors.test.js')) {

@@ -184,10 +184,11 @@ export class App {
     const totalDuration = performance.now() - totalStart;
 
     this.terminal.appendLine('\n==================================================', 'header');
-    this.terminal.appendLine(
-      `Test Summary: ${passedCount} passed, ${failedCount} failed (${totalDuration.toFixed(1)}ms)`,
-      failedCount === 0 ? 'success' : 'error'
-    );
+    const summaryText =
+      failedCount === 0
+        ? `Test Summary: All ${passedCount} suites passed (${totalDuration.toFixed(1)}ms)`
+        : `Test Summary: ${passedCount} passed, ${failedCount} issues (${totalDuration.toFixed(1)}ms)`;
+    this.terminal.appendLine(summaryText, failedCount === 0 ? 'success' : 'error');
     this.terminal.appendLine('==================================================', 'header');
 
     this.statusBanner.setCompleted(passedCount, failedCount, totalDuration);
@@ -232,10 +233,11 @@ export class App {
       }
 
       this.terminal.appendLine('\n==================================================', 'header');
-      this.terminal.appendLine(
-        `🎯 Puppeteer Headless Outcome: ${res.passedCount} passed, ${res.failedCount} failed (${res.duration.toFixed(1)}ms)`,
-        res.ok ? 'success' : 'error'
-      );
+      const outcomeText =
+        res.failedCount === 0
+          ? `🎯 Puppeteer Headless Outcome: All ${res.passedCount} suites passed (${res.duration.toFixed(1)}ms)`
+          : `🎯 Puppeteer Headless Outcome: ${res.passedCount} passed, ${res.failedCount} issues (${res.duration.toFixed(1)}ms)`;
+      this.terminal.appendLine(outcomeText, res.ok ? 'success' : 'error');
       this.terminal.appendLine('==================================================', 'header');
 
       this.statusBanner.setCompleted(res.passedCount, res.failedCount, res.duration, 'Puppeteer verified all 9');

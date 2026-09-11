@@ -47,7 +47,11 @@ for (const file of testFiles) {
 }
 
 console.log('\n' + '='.repeat(50));
-console.log(`Test Summary: ${passed} passed, ${failed} failed.`);
+if (failed === 0) {
+  console.log(`Test Summary: All ${passed} suites passed.`);
+} else {
+  console.log(`Test Summary: ${passed} passed, ${failed} issues.`);
+}
 console.log('='.repeat(50));
 
 if (failed > 0) {
