@@ -94,7 +94,7 @@ export class App {
     const res = await executeSuite(suite, (log) => {
       let lineType = 'info';
       if (log.text.includes('✓')) lineType = 'success';
-      else if (log.text.includes('Error') || log.type === 'error') lineType = 'error';
+      else if (log.type === 'error' || log.text.includes('✖') || log.text.includes('FAIL')) lineType = 'error';
       else if (log.text.includes('ops/sec')) lineType = 'perf';
       this.terminal.appendLine(log.text, lineType);
     });
@@ -137,7 +137,7 @@ export class App {
       const res = await executeSuite(s, (log) => {
         let lineType = 'info';
         if (log.text.includes('✓')) lineType = 'success';
-        else if (log.text.includes('Error') || log.type === 'error') lineType = 'error';
+        else if (log.type === 'error' || log.text.includes('✖') || log.text.includes('FAIL')) lineType = 'error';
         else if (log.text.includes('ops/sec')) lineType = 'perf';
         this.terminal.appendLine(log.text, lineType);
       });

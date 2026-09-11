@@ -113,9 +113,11 @@ export async function runPuppeteerSuite() {
     page.on('console', (msg) => {
       const text = msg.text();
       logs.push(text);
-      if (text.includes('✓') || text.includes('PASS')) {
+      if (msg.type() === 'error') {
+        console.error(`\x1b[31m[Browser Error]\x1b[0m ${text}`);
+      } else if (text.includes('✓') || text.includes('PASS')) {
         console.log(`\x1b[32m[Browser]\x1b[0m ${text}`);
-      } else if (text.includes('✖') || text.includes('FAIL') || text.includes('Error')) {
+      } else if (text.includes('✖') || text.includes('FAIL')) {
         console.log(`\x1b[31m[Browser]\x1b[0m ${text}`);
       } else {
         console.log(`[Browser] ${text}`);

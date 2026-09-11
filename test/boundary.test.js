@@ -47,11 +47,11 @@ async function run() {
   console.log('✓ All boundary condition tests passed.');
 }
 
-run().catch((err) => {
-  console.error(err);
-  if (typeof process !== 'undefined' && process.exit) {
+if (typeof process !== 'undefined' && process.argv?.[1]?.includes('boundary.test.js')) {
+  run().catch((err) => {
+    console.error(err);
     process.exit(1);
-  }
-});
+  });
+}
 
 export { run };

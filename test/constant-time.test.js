@@ -29,11 +29,11 @@ async function run() {
   console.log('✓ All constant-time operation tests passed.');
 }
 
-run().catch((err) => {
-  console.error(err);
-  if (typeof process !== 'undefined' && process.exit) {
+if (typeof process !== 'undefined' && process.argv?.[1]?.includes('constant-time.test.js')) {
+  run().catch((err) => {
+    console.error(err);
     process.exit(1);
-  }
-});
+  });
+}
 
 export { run };
