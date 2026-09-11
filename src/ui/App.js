@@ -25,6 +25,7 @@ export class App {
     this.header = new Header({ activePage: this.activePage });
     this.statusBanner = new StatusBanner({
       onRunAll: () => this.runAll(),
+      onRunPuppeteer: () => this.runPuppeteer(),
       onClearTerminal: () => this.terminal.clear(),
     });
     this.progressBar = new ProgressBar();
@@ -72,9 +73,10 @@ export class App {
     // Expose helpers globally for backward compatibility
     window.runAllTests = () => this.runAll();
     window.runSingleSuite = (id) => this.runSingle(id);
+    window.runPuppeteer = () => this.runPuppeteer();
     window.clearTerminal = () => this.terminal.clear();
 
-    // Auto-run all tests on load
+    // Auto-run all tests on load in browser
     this.runAll();
   }
 
@@ -110,7 +112,7 @@ export class App {
   }
 
   /**
-   * Executes all test suites sequentially.
+   * Executes all test suites sequentially inside the current browser window.
    */
   async runAll() {
     if (this.isRunningAll) return;
@@ -168,5 +170,59 @@ export class App {
     this.statusBanner.setCompleted(passedCount, failedCount, totalDuration);
     this.metricsGrid.update(passedCount, failedCount, totalDuration);
     this.isRunningAll = false;
+  }
+
+  /**
+   * Triggers the headless Puppeteer suite on the server and streams feedback.
+   */
+  async runPuppeteer() {
+    if (this.isRunningAll) return;
+    this.isRunningAll = true;
+
+    this.statusBanner.setRunning('Launching headless Chromium via Puppeteer...');
+    this.progressBar.reset();
+    this.progressBar.setProgress(30);
+
+    this.terminal.appendLine('\n==================================================', 'header');
+    this.terminal.appendLine('🤖 Triggering Headless Puppeteer Suite (/api/run-puppeteer)', 'header');
+    this.terminal.appendLine('==================================================', 'header');
+
+    try {
+      const response = await fetch('/api/run-puppeteer', { method: 'POST' });
+      const data = await response.json();
+
+      this.progressBar.setProgress(100);
+
+      if (!data.success) {
+        throw new Error(data.error || 'Puppeteer runner failed');
+      }
+
+      const res = data.result;
+      if (res.logs && Array.isArray(res.logs)) {
+        res.logs.forEach((log) => {
+          let lineType = 'info';
+          if (log.includes('✓') || log.includes('PASS')) lineType = 'success';
+          else if (log.includes('✖') || log.includes('FAIL') || log.includes('Error')) lineType = 'error';
+          else if (log.includes('ops/sec')) lineType = 'perf';
+          this.terminal.appendLine(`[Puppeteer] ${log}`, lineType);
+        });
+      }
+
+      this.terminal.appendLine('\n==================================================', 'header');
+      this.terminal.appendLine(
+        `🎯 Puppeteer Headless Outcome: ${res.passedCount} passed, ${res.failedCount} failed (${res.duration.toFixed(1)}ms)`,
+        res.ok ? 'success' : 'error'
+      );
+      this.terminal.appendLine('==================================================', 'header');
+
+      this.statusBanner.setCompleted(res.passedCount, res.failedCount, res.duration, 'Puppeteer verified all 9');
+      this.metricsGrid.update(res.passedCount, res.failedCount, res.duration);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.terminal.appendLine(`✖ Puppeteer Error: ${msg}`, 'error');
+      this.statusBanner.setCompleted(0, 1, 0);
+    } finally {
+      this.isRunningAll = false;
+    }
   }
 }

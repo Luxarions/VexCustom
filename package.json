@@ -21,12 +21,15 @@
     "./vex": "./src/core/child/Vex.js"
   },
   "scripts": {
-    "test": "node test/run-all.js",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "node build.js",
+    "preview": "node server.js",
+    "test": "node test/run-all.js && node test/puppeteer.js",
+    "test:node": "node test/run-all.js",
+    "test:puppeteer": "node test/puppeteer.js",
     "typecheck": "tsc --noEmit",
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
   "keywords": [
@@ -44,8 +47,8 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "puppeteer": "^25.10.0",
+    "typescript": "~5.8.2"
   },
   "engines": {
     "node": ">=18.0.0"
