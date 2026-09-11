@@ -11,6 +11,7 @@ import { MetricsGrid } from './MetricsGrid.js';
 import { SuitesList } from './SuitesList.js';
 import { Terminal } from './Terminal.js';
 import { Footer } from './Footer.js';
+import { MobileTabs } from './MobileTabs.js';
 
 export class App {
   /**
@@ -30,6 +31,9 @@ export class App {
     });
     this.progressBar = new ProgressBar();
     this.metricsGrid = new MetricsGrid(this.suites.length);
+    this.mobileTabs = new MobileTabs({
+      onTabChange: (tab) => this.handleMobileTab(tab),
+    });
     this.suitesList = new SuitesList(this.suites, {
       onRunSuite: (id) => this.runSingle(id),
     });
@@ -57,10 +61,13 @@ export class App {
     main.appendChild(this.progressBar.render());
     main.appendChild(this.metricsGrid.render());
 
+    // Mobile segmented tab switcher
+    main.appendChild(this.mobileTabs.render());
+
     // Split Layout
     const split = document.createElement('div');
     split.id = 'layout-split-view';
-    split.className = 'layout-split';
+    split.className = 'layout-split mobile-view-suites';
     split.appendChild(this.suitesList.render());
     split.appendChild(this.terminal.render());
 
@@ -78,6 +85,22 @@ export class App {
 
     // Auto-run all tests on load in browser
     this.runAll();
+  }
+
+  /**
+   * Switches mobile layout visibility between Suites and Terminal.
+   * @param {'suites' | 'terminal'} tab
+   */
+  handleMobileTab(tab) {
+    const split = document.getElementById('layout-split-view');
+    if (!split) return;
+    if (tab === 'suites') {
+      split.classList.add('mobile-view-suites');
+      split.classList.remove('mobile-view-terminal');
+    } else {
+      split.classList.add('mobile-view-terminal');
+      split.classList.remove('mobile-view-suites');
+    }
   }
 
   /**
